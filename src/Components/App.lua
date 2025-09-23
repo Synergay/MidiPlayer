@@ -14,6 +14,7 @@ local FastDraggable = require(midiPlayer.FastDraggable)
 local Controller = require(midiPlayer.Components.Controller)
 local Sidebar = require(midiPlayer.Components.Sidebar)
 local Preview = require(midiPlayer.Components.Preview)
+local Tabs = require(midiPlayer.Components.Tabs)
 
 local gui = midiPlayer.Assets.ScreenGui
 
@@ -31,6 +32,7 @@ function App:Init()
     Controller:Init(gui.Frame)
     Sidebar:Init(gui.Frame)
     Preview:Init(gui.Frame)
+    Tabs:Init(gui.Frame)
 
 end
 
