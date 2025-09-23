@@ -19,8 +19,8 @@ local function createTabBar(parent)
     bar.Name = "TabBar"
     bar.BackgroundTransparency = 1
     bar.BorderSizePixel = 0
-    -- Fill the header width with slight horizontal padding
-    bar.Size = UDim2.new(1, -16, 1, 0)
+    -- Fixed-height strip across the top of the header
+    bar.Size = UDim2.new(1, -16, 0, 36)
     bar.AnchorPoint = Vector2.new(0, 0)
     bar.Position = UDim2.new(0, 8, 0, 0)
     bar.ZIndex = 10
@@ -48,8 +48,8 @@ local function createButton(name)
     btn.BackgroundTransparency = 0.2
     btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     btn.BorderSizePixel = 0
-    -- Make buttons taller to match the header height (minus small padding)
-    btn.Size = UDim2.new(0, 120, 1, -8)
+    -- Buttons fill the TabBar height
+    btn.Size = UDim2.new(0, 120, 1, 0)
     btn.ZIndex = 11
     return btn
 end
@@ -64,15 +64,13 @@ local function ensureScreen(name)
     scr.BorderSizePixel = 0
     scr.ZIndex = 2
 
-    -- Try to position over the content area (below Handle if present)
-    local contentTop = 0
-    local handle = frame:FindFirstChild("Handle")
-    if handle then
-        contentTop = handle.AbsoluteSize.Y
-        -- If AbsoluteSize not ready yet, fall back to a reasonable default
-        if contentTop == 0 then contentTop = 28 end
-    else
-        contentTop = 28
+    -- Position content below the TabBar height
+    local contentTop = 36
+    local host = frame:FindFirstChild("Handle") or frame
+    local bar = host:FindFirstChild("TabBar")
+    if bar then
+        contentTop = bar.AbsoluteSize.Y
+        if contentTop == 0 then contentTop = 36 end
     end
 
     scr.Position = UDim2.new(0, 0, 0, contentTop)
