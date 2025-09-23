@@ -2,6 +2,7 @@
 -- Adds a simple tab bar to switch between UI screens
 
 local midiPlayer = script:FindFirstAncestor("MidiPlayer")
+local Thread = require(midiPlayer.Util.Thread)
 
 local Tabs = {
     _active = "Player";
@@ -23,7 +24,7 @@ local function createTabBar(parent)
     bar.Size = UDim2.new(1, -16, 0, 36)
     bar.AnchorPoint = Vector2.new(0, 0)
     bar.Position = UDim2.new(0, 8, 0, 0)
-    bar.ZIndex = 10
+    bar.ZIndex = 100
     bar.Parent = parent
 
     local layout = Instance.new("UIListLayout")
@@ -50,7 +51,7 @@ local function createButton(name)
     btn.BorderSizePixel = 0
     -- Buttons fill the TabBar height
     btn.Size = UDim2.new(0, 120, 1, 0)
-    btn.ZIndex = 11
+    btn.ZIndex = 101
     return btn
 end
 
@@ -62,7 +63,7 @@ local function ensureScreen(name)
     scr.BackgroundTransparency = 0
     scr.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     scr.BorderSizePixel = 0
-    scr.ZIndex = 2
+    scr.ZIndex = 40
 
     -- Position content below the TabBar height
     local contentTop = 36
@@ -98,6 +99,35 @@ local function ensureScreen(name)
     return scr
 end
 
+local function layoutActiveScreen(targetName)
+    -- Compute top offset from TabBar height
+    local host = frame:FindFirstChild("Handle") or frame
+    local bar = host:FindFirstChild("TabBar")
+    local top = (bar and bar.AbsoluteSize.Y or 36)
+    if top == 0 then top = 36 end
+
+    -- Compute left offset if Sidebar is visible
+    local left = 0
+    local hasSidebar = frame:FindFirstChild("Sidebar")
+    if hasSidebar and hasSidebar.Visible then
+        left = hasSidebar.AbsoluteSize.X
+        if left == 0 then
+            -- Fallback to the configured Size offset if absolute isn't ready yet
+            left = hasSidebar.Size.X.Offset
+        end
+    end
+
+    for _, scrName in ipairs(TAB_NAMES) do
+        if scrName ~= "Player" then
+            local scr = screens[scrName] or ensureScreen(scrName)
+            if scrName == targetName then
+                scr.Position = UDim2.new(0, left, 0, top)
+                scr.Size = UDim2.new(1, -left, 1, -top)
+            end
+        end
+    end
+end
+
 function Tabs:_setActive(name)
     self._active = name
 
@@ -114,8 +144,9 @@ function Tabs:_setActive(name)
     local hasPlayer = frame:FindFirstChild("Main") and frame:FindFirstChild("Sidebar") and frame:FindFirstChild("Preview")
     if hasPlayer then
         local isPlayer = (name == "Player")
+        local showSidebar = isPlayer or (name == "Playlist")
         frame.Main.Visible = isPlayer
-        frame.Sidebar.Visible = isPlayer
+        frame.Sidebar.Visible = showSidebar
         frame.Preview.Visible = isPlayer
     end
 
@@ -125,6 +156,12 @@ function Tabs:_setActive(name)
             scr.Visible = (scrName == name)
         end
     end
+
+    layoutActiveScreen(name)
+    -- Re-layout on next frame to account for AbsoluteSize updates
+    Thread.Delay(0, function()
+        layoutActiveScreen(name)
+    end)
 end
 
 function Tabs:Init(root)

@@ -161,21 +161,28 @@ function Playlist:_buildUI()
     header.BackgroundTransparency = 1
     header.Size = UDim2.new(1, -16, 0, 36)
     header.Position = UDim2.new(0, 8, 0, 8)
+    header.ZIndex = 50
     header.Parent = screen
 
     local currentBtn = createButton(header, "PlaylistSelect", self._selected, 16, UDim2.new(0, 0, 0, 0))
+    currentBtn.ZIndex = 51
     currentBtn.Size = UDim2.fromOffset(180, 28)
 
     local newBtn = createButton(header, "NewBtn", "+ New", 14, UDim2.new(0, 188, 0, 0))
+    newBtn.ZIndex = 51
     newBtn.Size = UDim2.fromOffset(80, 28)
     local renameBtn = createButton(header, "RenameBtn", "Rename", 14, UDim2.new(0, 272, 0, 0))
+    renameBtn.ZIndex = 51
     renameBtn.Size = UDim2.fromOffset(90, 28)
     local deleteBtn = createButton(header, "DeleteBtn", "Delete", 14, UDim2.new(0, 366, 0, 0))
+    deleteBtn.ZIndex = 51
     deleteBtn.Size = UDim2.fromOffset(80, 28)
 
     local playBtn = createButton(header, "PlayBtn", "Play", 16, UDim2.new(1, -280, 0, 0), Vector2.new(1, 0))
+    playBtn.ZIndex = 51
     playBtn.Size = UDim2.fromOffset(120, 28)
     local stopBtn = createButton(header, "StopBtn", "Stop", 16, UDim2.new(1, -150, 0, 0), Vector2.new(1, 0))
+    stopBtn.ZIndex = 51
     stopBtn.Size = UDim2.fromOffset(120, 28)
 
     -- Dropdown panel (hidden by default)
@@ -187,9 +194,11 @@ function Playlist:_buildUI()
     dropdown.Position = UDim2.new(0, 0, 0, 32)
     dropdown.Size = UDim2.fromOffset(180, 160)
     dropdown.Visible = false
+    dropdown.ZIndex = 60
     dropdown.Parent = header
 
     local dropList = createList(dropdown, "Playlists", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 1, 0))
+    dropList.ZIndex = 61
 
     -- Body: left list (all songs), right list (playlist)
     local body = Instance.new("Frame")
@@ -197,19 +206,27 @@ function Playlist:_buildUI()
     body.BackgroundTransparency = 1
     body.Position = UDim2.new(0, 8, 0, 52)
     body.Size = UDim2.new(1, -16, 1, -60)
+    body.ZIndex = 50
     body.Parent = screen
 
-    createText(body, "AllSongsTitle", "All Songs", 16, UDim2.new(0, 0, 0, 0))
+    local asTitle = createText(body, "AllSongsTitle", "All Songs", 16, UDim2.new(0, 0, 0, 0))
+    asTitle.ZIndex = 51
     local songsList = createList(body, "AllSongs", UDim2.new(0, 0, 0, 24), UDim2.new(0.5, -6, 1, -24))
+    songsList.ZIndex = 51
 
-    createText(body, "PlaylistTitle", "Playlist", 16, UDim2.new(0.5, 6, 0, 0))
+    local plTitle = createText(body, "PlaylistTitle", "Playlist", 16, UDim2.new(0.5, 6, 0, 0))
+    plTitle.ZIndex = 51
     local playlistList = createList(body, "PlaylistSongs", UDim2.new(0.5, 6, 0, 24), UDim2.new(0.5, -6, 1, -60))
+    playlistList.ZIndex = 51
 
     local removeBtn = createButton(body, "RemoveBtn", "Remove", 14, UDim2.new(0.5, 6, 1, -30))
+    removeBtn.ZIndex = 51
     removeBtn.Size = UDim2.fromOffset(90, 28)
     local upBtn = createButton(body, "UpBtn", "Up", 14, UDim2.new(0.5, 102, 1, -30))
+    upBtn.ZIndex = 51
     upBtn.Size = UDim2.fromOffset(60, 28)
     local downBtn = createButton(body, "DownBtn", "Down", 14, UDim2.new(0.5, 168, 1, -30))
+    downBtn.ZIndex = 51
     downBtn.Size = UDim2.fromOffset(60, 28)
 
     -- Store refs
@@ -242,6 +259,7 @@ function Playlist:_refreshPlaylistsDropdown()
         btn.Size = UDim2.new(1, -8, 0, 28)
         btn.AnchorPoint = Vector2.new(0, 0)
         btn.Position = UDim2.new(0, 4, 0, total)
+        btn.ZIndex = 62
         btn.MouseButton1Click:Connect(function()
             self._selected = name
             ui.currentBtn.Text = name
@@ -271,6 +289,7 @@ function Playlist:_refreshAllSongs()
         row.Size = UDim2.new(1, -8, 0, 28)
         row.AnchorPoint = Vector2.new(0, 0)
         row.Position = UDim2.new(0, 4, 0, total)
+        row.ZIndex = 52
         row.MouseButton1Click:Connect(function()
             local list = self._playlists[self._selected]
             table.insert(list, filePath)
@@ -294,6 +313,7 @@ function Playlist:_refreshPlaylistSongs()
         row.AnchorPoint = Vector2.new(0, 0)
         row.BackgroundColor3 = isCurrent and Color3.fromRGB(60, 60, 60) or Color3.fromRGB(40, 40, 40)
         row.Position = UDim2.new(0, 4, 0, total)
+        row.ZIndex = 52
         row.MouseButton1Click:Connect(function()
             -- select and load this song
             self._currentIndex = i
