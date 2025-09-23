@@ -15,6 +15,7 @@ local Controller = require(midiPlayer.Components.Controller)
 local Sidebar = require(midiPlayer.Components.Sidebar)
 local Preview = require(midiPlayer.Components.Preview)
 local Tabs = require(midiPlayer.Components.Tabs)
+local Playlist = require(midiPlayer.Components.Playlist)
 
 local gui = midiPlayer.Assets.ScreenGui
 
@@ -33,6 +34,7 @@ function App:Init()
     Sidebar:Init(gui.Frame)
     Preview:Init(gui.Frame)
     Tabs:Init(gui.Frame)
+    Playlist:Init(gui.Frame)
 
 end
 
