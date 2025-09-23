@@ -7,7 +7,7 @@ local Tabs = {
     _active = "Player";
 }
 
-local TAB_NAMES = { "Player", "Library", "Settings" }
+local TAB_NAMES = { "Player", "Playlist", "Settings" }
 
 local frame -- root frame (gui.Frame)
 local tabBar
@@ -19,18 +19,19 @@ local function createTabBar(parent)
     bar.Name = "TabBar"
     bar.BackgroundTransparency = 1
     bar.BorderSizePixel = 0
-    bar.Size = UDim2.new(0, 280, 1, 0) -- width fits three buttons
-    bar.AnchorPoint = Vector2.new(1, 0)
-    bar.Position = UDim2.new(1, -8, 0, 0) -- right-aligned with small padding
+    -- Fill the header width with slight horizontal padding
+    bar.Size = UDim2.new(1, -16, 1, 0)
+    bar.AnchorPoint = Vector2.new(0, 0)
+    bar.Position = UDim2.new(0, 8, 0, 0)
     bar.ZIndex = 10
     bar.Parent = parent
 
     local layout = Instance.new("UIListLayout")
     layout.FillDirection = Enum.FillDirection.Horizontal
-    layout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
     layout.VerticalAlignment = Enum.VerticalAlignment.Center
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 6)
+    layout.Padding = UDim.new(0, 8)
     layout.Parent = bar
 
     return bar
@@ -42,12 +43,13 @@ local function createButton(name)
     btn.Text = name
     btn.AutoButtonColor = true
     btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 14
+    btn.TextSize = 16
     btn.TextColor3 = Color3.fromRGB(240, 240, 240)
-    btn.BackgroundTransparency = 0.3
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.BackgroundTransparency = 0.2
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     btn.BorderSizePixel = 0
-    btn.Size = UDim2.fromOffset(80, 24)
+    -- Make buttons taller to match the header height (minus small padding)
+    btn.Size = UDim2.new(0, 120, 1, -8)
     btn.ZIndex = 11
     return btn
 end
@@ -76,18 +78,20 @@ local function ensureScreen(name)
     scr.Position = UDim2.new(0, 0, 0, contentTop)
     scr.Size = UDim2.new(1, 0, 1, -contentTop)
 
-    -- Simple placeholder content
-    local label = Instance.new("TextLabel")
-    label.Name = "Title"
-    label.AnchorPoint = Vector2.new(0.5, 0.5)
-    label.Position = UDim2.fromScale(0.5, 0.5)
-    label.Size = UDim2.fromOffset(300, 40)
-    label.BackgroundTransparency = 1
-    label.Text = name .. " (placeholder)"
-    label.TextColor3 = Color3.fromRGB(200, 200, 200)
-    label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 24
-    label.Parent = scr
+    -- Placeholder only for non-Playlist/Player/Settings if needed
+    if name ~= "Playlist" and name ~= "Player" and name ~= "Settings" then
+        local label = Instance.new("TextLabel")
+        label.Name = "Title"
+        label.AnchorPoint = Vector2.new(0.5, 0.5)
+        label.Position = UDim2.fromScale(0.5, 0.5)
+        label.Size = UDim2.fromOffset(300, 40)
+        label.BackgroundTransparency = 1
+        label.Text = name .. " (placeholder)"
+        label.TextColor3 = Color3.fromRGB(200, 200, 200)
+        label.Font = Enum.Font.GothamSemibold
+        label.TextSize = 24
+        label.Parent = scr
+    end
 
     scr.Visible = false
     scr.Parent = frame
@@ -102,9 +106,9 @@ function Tabs:_setActive(name)
     -- Visual state for buttons
     for tabName, btn in pairs(buttons) do
         if tabName == name then
-            btn.BackgroundTransparency = 0.1
+            btn.BackgroundTransparency = 0.05
         else
-            btn.BackgroundTransparency = 0.3
+            btn.BackgroundTransparency = 0.2
         end
     end
 
@@ -128,7 +132,7 @@ end
 function Tabs:Init(root)
     frame = root
 
-    -- Place the tab bar inside Handle if available (top header), else at top of root frame
+    -- Place the tab bar inside Handle (header) if available, else at top of root frame
     local host = frame:FindFirstChild("Handle") or frame
     tabBar = host:FindFirstChild("TabBar") or createTabBar(host)
 
